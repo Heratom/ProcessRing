@@ -8,7 +8,7 @@ import static utils.State.Stopped;
 import interfaces.Contactable;
 import utils.State;
 
-public class Process implements Contactable {
+public class Process implements Contactable, Runnable {
 	private final int ID;
 	private State state;
 	
@@ -66,6 +66,11 @@ public class Process implements Contactable {
 		return ID;
 	}
 	
+	//*** Thread methods ***\\
+	
+	public void run() {
+		
+	}
 	
 	//*** Contact methods ***\\
 	
