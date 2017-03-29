@@ -13,31 +13,39 @@ import utils.Rand;
  *
  */
 public class ProcessManager {
-	private final static int nbProcesses = 10;
+	private static int nbProcesses = 0;
 	private static List<Process> processes = new LinkedList<Process>();
 	private static Rand random = new Rand();
+	private static Process proxy;
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		for(int i=0; i < nbProcesses; i++) {
-			processes.add(new Process(i));
+		Process A = new Process (nbProcesses + 1, null);
+		if(A.getState()!=utils.State.Running) {
+			Println("[ProcessManager] initialization failed : proxy isn't running.");
 		}
-		Println(processes.size());
-		PrintRing(processes);
-		int var1 = rand(processes.size());
-		int var2 = rand(processes.size());
-		processes.get(var1).Halt();
-		processes.get(var2).Halt();
-		PrintRing(processes);
-		processes.get(var1).Stop();
-		processes.get(var1).Restart();
-		processes.get(var2).Restart();
-		PrintRing(processes);
+		else {
+			processes.add(A);
+			proxy=A;
+			nbProcesses++;
+			PrintRing();
+			addProcess();
+			PrintRing();
+			Println("Group incoming");
+			for(Process B:processes) {
+				B.printGroup();
+			}
+		}
+	}
+	
+	private static void addProcess() {
+		processes.add(new Process(nbProcesses+1, proxy));
+		nbProcesses++;
 	}
 
-	private static void PrintRing(List<Process> processes) {
+	private static void PrintRing() {
 		for(Process p: processes) {
 			Println(p.toString());
 		}

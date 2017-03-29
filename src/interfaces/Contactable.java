@@ -1,6 +1,8 @@
 package interfaces;
 
+import main.Ack;
 import main.Message;
+import main.Process;
 
 /**
  * Should be implemented by each process that wants to communicate.
@@ -9,9 +11,9 @@ import main.Message;
  */
 public interface Contactable {
 	public boolean pingMe();
-	public boolean ping(int ID);
+	public boolean ping(Process P);
 	public void receiveMessage(Message M, int IDS);
-	public void receiveAck(Message M, int IDS);
+	public void receiveAck(Ack A);
 	public void broadcastMessage(Message M);
 	public void broadcastAck(Message M);
 }
