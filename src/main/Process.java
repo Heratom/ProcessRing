@@ -16,6 +16,7 @@ import utils.State;
 
 public class Process implements Contactable, Runnable {
 	private final int ID;
+	private int clock;
 	private State state;
 	private Set<Process> Group;
 	private Map<Long, Message>fileAttente;	// Need ordre !!! par timestamp !!
@@ -25,6 +26,7 @@ public class Process implements Contactable, Runnable {
 	
 	public Process(int i, Process P) {
 		this.ID = i;
+		this.clock = 0;
 		this.setState(Running);
 		this.fileAttente = new HashMap<>();
 		this.Group = new HashSet<>();
@@ -101,7 +103,8 @@ public class Process implements Contactable, Runnable {
 	public void run() {
 		while(getState()==Running) {
 			pingAll();
-			broadcastMessage(new Message(this.ID, "Hello World ! I am process " + this.ID + "."));
+			broadcastMessage(new Message(this.ID, "Hello World ! I am process " + this.ID + ".", this.clock));
+			this.clock++;
 			try {
 				TimeUnit.SECONDS.sleep(2L);
 			} catch (InterruptedException e) {
@@ -137,13 +140,20 @@ public class Process implements Contactable, Runnable {
 	public void receiveMessage(Message M, int IDS) {
 		if(this.getState()==Running) {
 			if(!this.fileAttente.containsKey(M.getID())) {
-				this.fileAttente.put(M.getID(), M);
-				this.listVecs.put(M.getID(), new AckVector());
+				addMessage(M);
 				this.broadcastAck(M);
 			}
 			else {
 				Println("[Process " + this.ID + "] Message reçu en double : " + M.getMessage());
 			}
+		}
+	}
+
+	private void addMessage(Message M) {
+		this.fileAttente.put(M.getID(), M);
+		this.listVecs.put(M.getID(), new AckVector());
+		if(this.clock++ < M.getClock()) {
+			this.clock = M.getClock();
 		}
 	}
 
